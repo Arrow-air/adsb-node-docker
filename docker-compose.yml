@@ -1,0 +1,42 @@
+---
+version: '3.6'
+
+services:
+  dump1090:
+    container_name: ${PACKAGE_NAME}-dump1090
+    image: ${PACKAGE_NAME}-dump1090:latest
+    restart: unless-stopped
+    ports:
+      - ${DUMP_1090_GUI_PORT}:${DUMP_1090_GUI_PORT}/tcp
+    expose:
+      - ${DUMP_1090_PORT}
+    devices:
+      - /dev/bus/usb
+    command: ./dump1090 --net --raw --net-ro-port ${DUMP_1090_PORT} --net-http-port ${DUMP_1090_GUI_PORT}
+    healthcheck:
+      test: ["CMD", "wget", "localhost:${DUMP_1090_GUI_PORT}"]
+      interval: 2s
+      timeout: 1s
+      retries: 5
+  feeder:
+    container_name: ${PACKAGE_NAME}-feeder
+    image: ${PACKAGE_NAME}-feeder:latest
+    depends_on:
+      dump1090:
+        condition: service_healthy
+    # volumes:
+    #   - type: bind
+    #     source: log4rs.yaml
+    #     target: /log4rs.yaml
+    # ports:
+    #   - ${HOST_PORT_REST}:${DOCKER_PORT_REST}
+    #   - ${HOST_PORT_GRPC}:${DOCKER_PORT_GRPC}
+    # healthcheck:
+    #   test: ["CMD", "grpc_health_probe", "-addr", "localhost:${DOCKER_PORT_GRPC}"]
+    #   interval: 2s
+    #   timeout: 1s
+    #   retries: 3
+    environment:
+      - DUMP_1090_HOST=dump1090
+      - DUMP_1090_PORT
+      - ADSB_URL

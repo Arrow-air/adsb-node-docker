@@ -1,0 +1,36 @@
+[package]
+name = "adsb-node-feeder"
+version = "0.1.0"
+categories = [
+  "aerospace::drones",
+  "aerospace::protocols",
+] # max 5 -- https://crates.io/category_slugs
+description = "Forwards ADS-B Packets to the Arrow Network"
+edition     = "2021"                                                       # Allowed values are 2015, 2018, 2021
+homepage    = "https://www.arrowair.com/docs/documentation/services/intro"
+keywords    = ["vtol", "server", "telemetry"]        
+
+[features]
+vendored-openssl = ['openssl/vendored']
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+mavlink = "0.10"
+clap = { version="4.1", features=["derive"] }
+openssl        = "0.10"
+reqwest = "0.11"
+uuid = "1.2.2"
+adsb_deku = "0.6.3"
+regex = "1.7.1"
+ringbuf = "0.3.2"
+hexlit = "0.5.5"
+hex = "0.4.3"
+
+[dependencies.tokio]
+version = "1.24"
+features = ["macros", "rt-multi-thread"]
+
+[dependencies.svc-telemetry-client-rest]
+git = "https://github.com/Arrow-air/svc-telemetry"
+branch = "am-smith/adsb-2"
